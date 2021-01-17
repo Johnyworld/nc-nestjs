@@ -17,8 +17,31 @@ describe('MoviesService', () => {
     expect(service).toBeDefined();
   });
 
-  it('should be 4', () => {
-    expect(2+2).toEqual(4);
+  describe('getAll', () => {
+    it('should return an array', () => {
+      const movies = service.getAll();
+      expect(movies).toBeInstanceOf(Array);
+    });
+  })
+  
+  describe('getOne', () => {
+    it('should return a movie ', () => {
+      service.create({
+        title: 'TestMovie',
+        genres: ['test'],
+        year: 2020,
+      });
+      const movie = service.getOne(1);
+      expect(movie).toBeDefined();
+    });
+
+    it('should throw a NotFoundException', () => {
+      try {
+        service.getOne(999)
+      } catch (err) {
+        expect(err).toBeInstanceOf(NotFoundException);
+      }
+    })
   });
 
   describe('create', () => {
@@ -32,6 +55,28 @@ describe('MoviesService', () => {
       const afterCreate = service.getAll().length;
       expect(afterCreate).toBeGreaterThan(beforeCreate);
     });
+  });
+
+  describe('update', () => {
+    it('should update a movie', () => {
+      service.create({
+        title: 'Test Movie',
+        genres: ['text'],
+        year: 2020,
+      }); 
+      service.update(1, {
+        title: 'Updated Test'
+      });
+      const movie = service.getOne(1);
+      expect(movie.title).toEqual('Updated Test');
+    });
+    it('should throw a NotFoundException', () => {
+      try {
+        service.update(999, {})
+      } catch (err) {
+        expect(err).toBeInstanceOf(NotFoundException);
+      }
+    })
   });
   
   describe('deleteOne', () => {
@@ -47,7 +92,7 @@ describe('MoviesService', () => {
       expect(afterDelete).toBeLessThan(beforeDelete);
       // service.deleteOne();
     })
-    it('should return a 404', () => {
+    it('should throw a NotFoundException', () => {
       try {
         service.deleteOne(999)
       } catch (err) {
